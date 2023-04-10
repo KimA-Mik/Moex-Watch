@@ -44,8 +44,8 @@ class MainActivity : AppCompatActivity() {
                     }
                     val sb = StringBuilder()
                     sb.append("It took $time ms\n")
-                    for (sec in tables[1].data){
-                        sb.append("${sec["SECID"]}:${ if (sec["BID"] == null) "No BID" else sec["BID"]  } - ${sec["ISSUECAPITALIZATION"]}\n")
+                    for (sec in tables[0].data){
+                        sb.append("${sec["SECID"]}(${ if (sec["SHORTNAME"] == null) "No SHORTNAME" else sec["SHORTNAME"]  }) - ${sec["PREVWAPRICE"]}\n")
                     }
                     mainViewModel.text = sb.toString()
                     binding.textView.text = mainViewModel.text
