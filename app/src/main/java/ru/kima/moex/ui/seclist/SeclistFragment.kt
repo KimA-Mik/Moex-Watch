@@ -41,8 +41,11 @@ class SeclistFragment : Fragment() {
         val securities = seclistViewModel.securities
         val adapter = SeclistaAdapter(securities)
         binding.securityRecyclerView.adapter = adapter
-        val decoration = DividerItemDecoration(activity, R.drawable.divider)
-        binding.securityRecyclerView.addItemDecoration(decoration)
+        //val decoration = DividerItemDecoration(activity, R.drawable.divider)
+        val decoration = activity?.let { DividerItemDecoration(it) }
+        if (decoration != null) {
+            binding.securityRecyclerView.addItemDecoration(decoration)
+        }
         binding.updateButton.setOnClickListener() {
             loadData()
         }

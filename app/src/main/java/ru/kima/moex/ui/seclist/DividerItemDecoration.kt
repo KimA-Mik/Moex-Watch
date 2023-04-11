@@ -9,7 +9,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 
-
+/*
+ * Thanks to
+ * https://stackoverflow.com/questions/24618829/how-to-add-dividers-and-spaces-between-items-in-recyclerview
+ */
 class DividerItemDecoration : ItemDecoration {
     private var divider: Drawable
 
