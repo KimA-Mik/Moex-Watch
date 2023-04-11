@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import ru.kima.moex.R
 import ru.kima.moex.data.Security
 import ru.kima.moex.databinding.FragmentSecuritiesListBinding
 import ru.kima.moex.moex.api.MoexResponse
@@ -40,7 +41,8 @@ class SeclistFragment : Fragment() {
         val securities = seclistViewModel.securities
         val adapter = SeclistaAdapter(securities)
         binding.securityRecyclerView.adapter = adapter
-
+        val decoration = DividerItemDecoration(activity, R.drawable.divider)
+        binding.securityRecyclerView.addItemDecoration(decoration)
         binding.updateButton.setOnClickListener() {
             loadData()
         }
@@ -64,16 +66,18 @@ class SeclistFragment : Fragment() {
             ?.getRequest(request.body) {
                 if (it.isNotEmpty()) {
                     val moexResponse = MoexResponse()
-                    val tables =  moexResponse.ParseFromJson(it)
+                    val tables = moexResponse.ParseFromJson(it)
 
 
-                    if (tables[0].data.size != tables[1].data.size){
-                        Toast.makeText(activity, "There are some error",
-                        Toast.LENGTH_LONG).show()
+                    if (tables[0].data.size != tables[1].data.size) {
+                        Toast.makeText(
+                            activity, "There are some error",
+                            Toast.LENGTH_LONG
+                        ).show()
                         return@getRequest
                     }
                     val count = tables[0].data.size
-                    for (i in tables[0].data.indices){
+                    for (i in tables[0].data.indices) {
                         val security = Security(
                             SECID = tables[0].data[i]["SECID"].toString(),
                             SECNAME = tables[0].data[i]["SECNAME"].toString(),
@@ -83,13 +87,17 @@ class SeclistFragment : Fragment() {
 
                     }
                     binding.securityRecyclerView.adapter?.notifyDataSetChanged()
-                    Toast.makeText(activity, "$count securities was loaded",
-                        Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        activity, "$count securities was loaded",
+                        Toast.LENGTH_LONG
+                    ).show()
                     binding.updateButton.isVisible = false
 
                 } else {
-                    Toast.makeText(activity, "Request error",
-                        Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        activity, "Request error",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         binding.updateButton.isActivated = true

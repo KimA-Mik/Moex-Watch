@@ -28,7 +28,9 @@ class SeclistaAdapter(
         holder.apply {
             binding.secidTextView.text = security.SECID
             binding.secnameTextView.text = security.SECNAME
-            binding.wapriceTextView.text = security.WAPRICE.toString()
+            val price = if (!security.WAPRICE.isNaN()) "${String.format("%.2f", security.WAPRICE)}₽"
+            else "Empty"
+            binding.wapriceTextView.text = price
         }
     }
 }

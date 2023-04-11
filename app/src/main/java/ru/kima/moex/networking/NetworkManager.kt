@@ -8,6 +8,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 
 private const val TAG = "NetworkManager"
+
 class NetworkManager private constructor(context: Context) {
     //for Volley API
     private var requestQueue: RequestQueue
@@ -37,6 +38,7 @@ class NetworkManager private constructor(context: Context) {
 
     companion object {
         private var instance: NetworkManager? = null
+
         @Synchronized
         fun getInstance(context: Context): NetworkManager? {
             if (null == instance) instance = NetworkManager(context)
