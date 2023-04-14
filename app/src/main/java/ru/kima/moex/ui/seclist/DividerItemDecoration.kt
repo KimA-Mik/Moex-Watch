@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView.ItemDecoration
  * Thanks to
  * https://stackoverflow.com/questions/24618829/how-to-add-dividers-and-spaces-between-items-in-recyclerview
  */
+const val MARGIN = 16
 class DividerItemDecoration : ItemDecoration {
     private var divider: Drawable
 
@@ -34,13 +35,13 @@ class DividerItemDecoration : ItemDecoration {
 
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         super.onDraw(c, parent, state)
-        val left = parent.paddingLeft
-        val right = parent.width - parent.paddingRight
+        val left = parent.paddingLeft + MARGIN
+        val right = parent.width - parent.paddingRight - MARGIN
         val childCount = parent.childCount
         for (i in 0 until childCount) {
             val child: View = parent.getChildAt(i)
             val params = child.layoutParams as RecyclerView.LayoutParams
-            val top: Int = child.bottom + params.bottomMargin
+            val top: Int = child.bottom + params.bottomMargin //+ MARGIN
             val bottom = top + divider.intrinsicHeight
             divider.setBounds(left, top, right, bottom)
             divider.draw(c)
