@@ -1,4 +1,4 @@
-package ru.kima.moex.data
+package ru.kima.moex.model
 
 
 data class Security(

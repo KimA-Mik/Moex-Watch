@@ -1,9 +1,9 @@
-package ru.kima.moex.ui.seclist
+package ru.kima.moex.views.seclist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import ru.kima.moex.data.Security
+import ru.kima.moex.model.Security
 import ru.kima.moex.databinding.ListItemSecurityBinding
 
 class SecurityHolder(
