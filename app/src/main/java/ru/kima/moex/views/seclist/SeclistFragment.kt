@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import ru.kima.moex.databinding.FragmentSecuritiesListBinding
@@ -22,7 +23,7 @@ class SeclistFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private val seclistViewModel: SeclistViewModel by viewModels { factory() }
+    private val viewModel: SeclistViewModel by viewModels { factory() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,7 +38,7 @@ class SeclistFragment : Fragment() {
             binding.securityRecyclerView.addItemDecoration(decoration)
         }
         binding.updateButton.setOnClickListener() {
-            seclistViewModel.loadData()
+            viewModel.loadData()
         }
         return binding.root
     }
@@ -51,9 +52,23 @@ class SeclistFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                seclistViewModel.data.collect { securities ->
-                    val adapter = SeclistaAdapter(securities)
-                    binding.securityRecyclerView.adapter = adapter
+                launch {
+                    viewModel.data.collect { securities ->
+                        val adapter = SeclistaAdapter(viewModel)
+                        adapter.securities = securities
+                        binding.securityRecyclerView.adapter = adapter
+                    }
+                }
+                launch {
+                    viewModel.showDetails.collect { navEvent ->
+                        navEvent?.let {
+                            navEvent.getValue()?.let { security ->
+                                findNavController().navigate(
+                                    SeclistFragmentDirections.showSecurityDetails(security.SECID)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }

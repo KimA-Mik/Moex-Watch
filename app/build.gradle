@@ -1,8 +1,9 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.20'
+    id 'org.jetbrains.kotlin.plugin.serialization'
     id 'org.jetbrains.kotlin.kapt'
+    id 'androidx.navigation.safeargs'
 }
 
 android {
@@ -35,7 +36,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding true
     }
     kotlinOptions {

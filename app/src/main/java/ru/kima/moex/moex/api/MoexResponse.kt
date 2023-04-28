@@ -1,10 +1,11 @@
 package ru.kima.moex.moex.api
 
+import android.icu.text.SimpleDateFormat
 import kotlinx.serialization.json.*
 
 class MoexResponse {
     companion object {
-        fun ParseFromJson(src: String): MutableList<MoexTable> {
+        fun parseFromJson(src: String): MutableList<MoexTable> {
 
             val res = mutableListOf<MoexTable>()
             val root = Json.parseToJsonElement(src)
@@ -30,39 +31,46 @@ class MoexResponse {
                     if (data != null && meta != null) {
                         for (record in data) {
                             val tempMap = mutableMapOf<String, Any>()
-                            var index = 0
-                            for (recordCol in record.jsonArray) {
+                            for ((index, recordCol) in record.jsonArray.withIndex()) {
                                 val name = tempTable.fields[index]
                                 val type = Json.decodeFromJsonElement<String>(
                                     meta.jsonObject[name]?.jsonObject?.get("type")!!
                                 )
 
-                                tempMap[name] = (if (type.equals("int32")) {
+                                tempMap[name] = (if (type == "int32") {
                                     if (recordCol.jsonPrimitive.intOrNull != null)
                                         Json.decodeFromJsonElement<Int>(recordCol)
                                     else
                                         0
-                                } else if (type.equals("string")) {
+                                } else if (type == "string") {
                                     if (recordCol.jsonPrimitive.isString) {
                                         Json.decodeFromJsonElement<String>(recordCol)
                                     } else {
                                         String()
                                     }
-                                } else if (type.equals("double")) {
+                                } else if (type == "double") {
                                     if (recordCol.jsonPrimitive.doubleOrNull != null)
                                         Json.decodeFromJsonElement<Double>(recordCol)
                                     else
                                         Double.NaN
-                                } else if (type.equals("int64")) {
+                                } else if (type == "int64") {
                                     if (recordCol.jsonPrimitive.longOrNull != null)
                                         Json.decodeFromJsonElement<Long>(recordCol)
                                     else
                                         0L
+                                } else if (type == "date") {
+                                    if (recordCol.jsonPrimitive.isString) {
+                                        val dateString =
+                                            Json.decodeFromJsonElement<String>(recordCol)
+                                        val parser = SimpleDateFormat("yyyy-MM-dd")
+                                        parser.parse(dateString)
+                                    } else {
+                                        String()
+                                    }
                                 } else {
                                     String()
                                 })
 
-                                index++
                             }
                             tempTable.data.add(tempMap)
 
