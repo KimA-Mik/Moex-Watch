@@ -22,7 +22,7 @@ class SecurityDetailsViewModel(
     val priceData = _priceData.asStateFlow()
     private fun loadData() = viewModelScope.launch(Dispatchers.IO) {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DATE, DAYS_IN_YEAR)
+        calendar.add(Calendar.DATE, -DAYS_IN_YEAR)
         val date = calendar.time
 
         _priceData.value = emptyList()

@@ -1,5 +1,6 @@
 package ru.kima.moex.model
 
+import android.text.format.DateFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -52,7 +53,8 @@ class SecurityService {
         from: Date
     ): Flow<List<SecurityDayPrice>> = flow {
         var index = 0L
-        var response = moexApi.getSecurityPriceHistoryFrom(secId, from, index)
+        val date = DateFormat.format("yyyy-MM-dd", from).toString()
+        var response = moexApi.getSecurityPriceHistoryFrom(secId, date, index)
         var tables = MoexResponse.parseFromJson(response)
         var result = parsePriceHistoryFromMoexTable(tables[0])
         emit(result)
@@ -62,7 +64,7 @@ class SecurityService {
 
         while (index + pageSize < totalRecords) {
             index += pageSize
-            response = moexApi.getSecurityPriceHistoryFrom(secId, from, index)
+            response = moexApi.getSecurityPriceHistoryFrom(secId, date, index)
             tables = MoexResponse.parseFromJson(response)
             result = parsePriceHistoryFromMoexTable(tables[0])
             emit(result)
@@ -74,7 +76,9 @@ class SecurityService {
         for (secItem in table.data) {
             val sec = SecurityDayPrice(
                 date = secItem["TRADEDATE"] as Date,
-                price = secItem["WAPRICE"] as Double
+                price = secItem["WAPRICE"] as Double,
+                lowPrice = secItem["LOW"] as Double,
+                highPrice = secItem["HIGH"] as Double
             )
             result += sec
         }

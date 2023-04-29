@@ -61,12 +61,10 @@ class SeclistFragment : Fragment() {
                 }
                 launch {
                     viewModel.showDetails.collect { navEvent ->
-                        navEvent?.let {
-                            navEvent.getValue()?.let { security ->
-                                findNavController().navigate(
-                                    SeclistFragmentDirections.showSecurityDetails(security.SECID)
-                                )
-                            }
+                        navEvent.getValue()?.let { security ->
+                            findNavController().navigate(
+                                SeclistFragmentDirections.showSecurityDetails(security.SECID)
+                            )
                         }
                     }
                 }

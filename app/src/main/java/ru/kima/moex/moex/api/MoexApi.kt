@@ -3,7 +3,6 @@ package ru.kima.moex.moex.api
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import java.util.Date
 
 interface MoexApi {
 
@@ -23,7 +22,7 @@ interface MoexApi {
     )
     suspend fun getSecurityPriceHistoryFrom(
         @Path("security") secId: String,
-        @Query("from") from: Date,
+        @Query("from") from: String,
         @Query("start") index: Long
     ): String
 }

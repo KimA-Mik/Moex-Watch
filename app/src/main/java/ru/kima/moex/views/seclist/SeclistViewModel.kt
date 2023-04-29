@@ -16,7 +16,7 @@ class SeclistViewModel(
     private val _data = MutableStateFlow<List<Security>>(emptyList())
     val data = _data.asStateFlow()
 
-    private val _showDetails = MutableStateFlow<Event<Security>?>(null)
+    private val _showDetails = MutableStateFlow<Event<Security?>>(Event(null))
     val showDetails = _showDetails.asStateFlow()
 
     init {

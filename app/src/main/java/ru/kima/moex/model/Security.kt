@@ -11,5 +11,7 @@ data class Security(
 
 data class SecurityDayPrice(
     val date: Date,
-    val price: Double
+    val price: Double,
+    val lowPrice: Double,
+    val highPrice: Double
 )
