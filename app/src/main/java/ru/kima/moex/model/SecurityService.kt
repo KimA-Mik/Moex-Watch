@@ -78,7 +78,9 @@ class SecurityService {
                 date = secItem["TRADEDATE"] as Date,
                 price = secItem["WAPRICE"] as Double,
                 lowPrice = secItem["LOW"] as Double,
-                highPrice = secItem["HIGH"] as Double
+                highPrice = secItem["HIGH"] as Double,
+                openPrice = secItem["OPEN"] as Double,
+                closePrice = secItem["CLOSE"] as Double
             )
             result += sec
         }
