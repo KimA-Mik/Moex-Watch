@@ -31,3 +31,6 @@ class ViewModelFactory(
 }
 
 fun Fragment.factory() = ViewModelFactory(requireContext().applicationContext as App)
+const val MILLISECONDS_IN_DAY = 86400000f
+const val MAGIC_DAYS = 11409f
+const val MAGIC_DAYS2 = 15000f

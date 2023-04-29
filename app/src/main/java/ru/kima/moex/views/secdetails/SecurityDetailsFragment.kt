@@ -1,8 +1,8 @@
 package ru.kima.moex.views.secdetails
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
-import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +14,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.XAxis.XAxisPosition
+import com.github.mikephil.charting.components.YAxis
 import kotlinx.coroutines.launch
 import ru.kima.moex.databinding.FragmentSecurityDetailBinding
 import ru.kima.moex.views.factory
+
 
 class SecurityDetailsFragment : Fragment() {
     private var _binding: FragmentSecurityDetailBinding? = null
@@ -68,24 +72,46 @@ class SecurityDetailsFragment : Fragment() {
                 launch {
                     // TODO: remove placeholder
                     viewModel.priceData.collect { priceList ->
-                        if (priceList.isEmpty())
-                            return@collect
-                        val sb = StringBuilder()
-                        for (day in priceList) {
-                            sb.append(
-                                "${
-                                    DateFormat.format(
-                                        "yyyy-MM-dd",
-                                        day.date
-                                    )
-                                } - ${day.price}\n"
-                            )
-                        }
-                        binding.textView.text = sb.toString()
+                    }
+                }
+
+                launch {
+                    viewModel.candleData.collect { candleData ->
+                        binding.candleChart.resetTracking()
+                        binding.candleChart.data = candleData
+                        binding.candleChart.invalidate()
                     }
                 }
             }
         }
         binding.secId.text = viewModel.SecurityId
+
+        binding.candleChart.setBackgroundColor(Color.WHITE)
+        binding.candleChart.description.isEnabled = false
+        // if more than 60 entries are displayed in the chart, no values will be
+        // drawn
+        binding.candleChart.setMaxVisibleValueCount(399)
+        // scaling can now only be done on x- and y-axis separately
+        binding.candleChart.setPinchZoom(false)
+        binding.candleChart.setDrawGridBackground(false)
+        val xAxis: XAxis = binding.candleChart.xAxis
+        xAxis.position = XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.valueFormatter = LineChartXAxisValueFormatter()
+
+        xAxis.granularity = 1f
+        xAxis.isGranularityEnabled = true
+        xAxis.setAvoidFirstLastClipping(true)
+
+
+        val leftAxis: YAxis = binding.candleChart.axisLeft
+        //        leftAxis.setEnabled(false);
+        leftAxis.setLabelCount(7, false)
+        leftAxis.setDrawGridLines(false)
+        leftAxis.setDrawAxisLine(false)
+
+        binding.candleChart.axisRight.isEnabled = false
+        binding.candleChart.legend.isEnabled = true
+
     }
 }
