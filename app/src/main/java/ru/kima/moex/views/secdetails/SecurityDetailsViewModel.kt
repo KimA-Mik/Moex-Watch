@@ -2,6 +2,7 @@ package ru.kima.moex.views.secdetails
 
 import android.graphics.Color
 import android.graphics.Paint
+import androidx.annotation.ColorInt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.mikephil.charting.components.YAxis
@@ -30,6 +31,11 @@ class SecurityDetailsViewModel(
     val priceData = _priceData.asStateFlow()
     private val _candleData = MutableStateFlow(CandleData())
     val candleData = _candleData.asStateFlow()
+
+    @ColorInt
+    var colorGreen = 0
+    @ColorInt
+    var colorRed = 0
     private fun loadData() = viewModelScope.launch(Dispatchers.IO) {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DATE, -DAYS_IN_YEAR)

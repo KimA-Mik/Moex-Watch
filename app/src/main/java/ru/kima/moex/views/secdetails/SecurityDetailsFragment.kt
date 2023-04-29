@@ -18,6 +18,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis
 import kotlinx.coroutines.launch
+import ru.kima.moex.R
 import ru.kima.moex.databinding.FragmentSecurityDetailBinding
 import ru.kima.moex.views.factory
 
@@ -36,6 +37,10 @@ class SecurityDetailsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.SecurityId = args.securityId
+        context?.let {
+            viewModel.colorGreen = it.getColor(R.color.ev_green)
+            viewModel.colorRed = it.getColor(R.color.ev_red)
+        }
     }
 
     override fun onCreateView(
