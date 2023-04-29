@@ -6,6 +6,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
@@ -47,9 +49,6 @@ class SeclistFragment : Fragment() {
         val decoration = activity?.let { DividerItemDecoration(it) }
         if (decoration != null) {
             binding.securityRecyclerView.addItemDecoration(decoration)
-        }
-        binding.updateButton.setOnClickListener() {
-            viewModel.loadData()
         }
 
         binding.securityRecyclerView.adapter = adapter
@@ -119,6 +118,13 @@ class SeclistFragment : Fragment() {
     }
 
     private fun updateSecuritiesList(securities: List<Security>) {
+        if (securities.isEmpty()) {
+            binding.securityRecyclerView.visibility = GONE
+            binding.securityListProgressBar.visibility = VISIBLE
+            return
+        }
+        binding.securityListProgressBar.visibility = GONE
+        binding.securityRecyclerView.visibility = VISIBLE
         val diffCallback = SecurityDiffCallback(adapter.securities, securities)
         val diffSecurities = DiffUtil.calculateDiff(diffCallback)
         adapter.securities = securities
