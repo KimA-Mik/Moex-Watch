@@ -21,10 +21,6 @@ class SeclistaAdapter(
 ) : RecyclerView.Adapter<SecurityHolder>() {
 
     var securities: List<Security> = emptyList()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SecurityHolder {
         val inflater = LayoutInflater.from(parent.context)
