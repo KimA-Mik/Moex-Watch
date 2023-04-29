@@ -1,0 +1,33 @@
+package ru.kima.moex.views
+
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import ru.kima.moex.App
+import ru.kima.moex.views.secdetails.SecurityDetailsViewModel
+import ru.kima.moex.views.seclist.SeclistViewModel
+
+class ViewModelFactory(
+    private val app: App
+) : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        val viewModel = when (modelClass) {
+            SeclistViewModel::class.java -> {
+                SeclistViewModel(app.securityService)
+            }
+
+            SecurityDetailsViewModel::class.java -> {
+                SecurityDetailsViewModel(app.securityService)
+            }
+
+            else -> {
+                throw IllegalStateException("Unknown view model class")
+            }
+        }
+        return viewModel as T
+    }
+}
+
+fun Fragment.factory() = ViewModelFactory(requireContext().applicationContext as App)

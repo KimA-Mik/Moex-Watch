@@ -1,4 +1,4 @@
-package ru.kima.moex.ui.seclist
+package ru.kima.moex.views.seclist
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView.ItemDecoration
  * https://stackoverflow.com/questions/24618829/how-to-add-dividers-and-spaces-between-items-in-recyclerview
  */
 const val MARGIN = 16
+
 class DividerItemDecoration : ItemDecoration {
     private var divider: Drawable
 
