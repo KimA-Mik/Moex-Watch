@@ -21,11 +21,32 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="8dp"
+        app:layout_constraintBottom_toTopOf="@id/timespan_select_group"
+        app:layout_constraintTop_toBottomOf="@id/secId"
+        />
+
+    <RadioGroup
+        android:id="@+id/timespan_select_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/secId"
+        app:layout_constraintTop_toBottomOf="@id/candle_chart">
 
-        />
+        <RadioButton
+            android:id="@+id/one_year_radio_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/one_year_button_text" />
 
+        <RadioButton
+            android:id="@+id/six_months_radio_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/six_months_button_text" />
+
+    </RadioGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>

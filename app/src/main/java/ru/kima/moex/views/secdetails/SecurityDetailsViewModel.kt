@@ -18,6 +18,7 @@ import ru.kima.moex.model.SecurityService
 import ru.kima.moex.views.MAGIC_DAYS
 import ru.kima.moex.views.MILLISECONDS_IN_DAY
 import java.util.Calendar
+import java.util.Date
 
 class SecurityDetailsViewModel(
     private val securityService: SecurityService
@@ -27,6 +28,7 @@ class SecurityDetailsViewModel(
             field = value
             loadData()
         }
+    private var allPriceData = listOf<SecurityDayPrice>()
     private val _priceData = MutableStateFlow<List<SecurityDayPrice>>(emptyList())
     val priceData = _priceData.asStateFlow()
     private val _candleData = MutableStateFlow(CandleData())
@@ -34,8 +36,29 @@ class SecurityDetailsViewModel(
 
     @ColorInt
     var colorGreen = 0
+
     @ColorInt
     var colorRed = 0
+
+    enum class TimeSpan(val index: Int) {
+        YEAR(0),
+        SIX_MONTHS(1)
+    }
+
+    var timeSpan = TimeSpan.YEAR
+        set(value) {
+            field = value
+            updateDateList()
+            updateFlows()
+        }
+
+
+    private var filterOptions = mutableListOf<Date>()
+
+    init {
+        updateDateList()
+    }
+
     private fun loadData() = viewModelScope.launch(Dispatchers.IO) {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DATE, -DAYS_IN_YEAR)
@@ -44,9 +67,14 @@ class SecurityDetailsViewModel(
         _priceData.value = emptyList()
         val response = securityService.getSecurityPriceHistoryFrom(SecurityId, date)
         response.collect { responseList ->
-            _priceData.value = listOf(_priceData.value, responseList).flatten()
-            updateCandleData(_priceData.value)
+            allPriceData = listOf(allPriceData, responseList).flatten()
+            updateFlows()
         }
+    }
+
+    private fun updateFlows() {
+        _priceData.value = allPriceData.filter { filterOptions[timeSpan.index].before(it.date) }
+        updateCandleData(_priceData.value)
     }
 
     private fun updateCandleData(priceData: List<SecurityDayPrice>) {
@@ -85,12 +113,25 @@ class SecurityDetailsViewModel(
         set.shadowWidth = 1f
         set.decreasingColor = Color.RED
         set.decreasingPaintStyle = Paint.Style.FILL
-        set.increasingColor = Color.rgb(122, 242, 84)
+        set.increasingColor = colorGreen
         set.increasingPaintStyle = Paint.Style.FILL_AND_STROKE
         set.neutralColor = Color.BLUE
 
         val data = CandleData(set)
         _candleData.value = data
+    }
+
+    private fun updateDateList() {
+        filterOptions.clear()
+
+        var calendar = Calendar.getInstance()
+        calendar.add(Calendar.DATE, -DAYS_IN_YEAR)
+        filterOptions.add(calendar.time)
+
+        calendar = Calendar.getInstance()
+        calendar.add(Calendar.DATE, -(DAYS_IN_YEAR / 2))
+        filterOptions.add(calendar.time)
+
     }
 
     companion object {

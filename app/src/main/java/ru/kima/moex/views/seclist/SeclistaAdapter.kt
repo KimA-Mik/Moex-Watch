@@ -17,7 +17,7 @@ class SecurityHolder(
 }
 
 class SeclistaAdapter(
-    private val listener: SecurityActionListener
+    private val listener: SeclistViewModel
 ) : RecyclerView.Adapter<SecurityHolder>() {
 
     var securities: List<Security> = emptyList()
@@ -35,11 +35,16 @@ class SeclistaAdapter(
         val security = securities[position]
         holder.itemView.tag = security
         holder.apply {
+
             binding.secidTextView.text = security.SECID
             binding.secnameTextView.text = security.SECNAME
             val price = if (!security.WAPRICE.isNaN()) "${String.format("%.2f", security.WAPRICE)}₽"
             else "Empty"
-            binding.wapriceTextView.text = price
+            if (security.LASTCHANGE != 0.0) {
+                binding.wapriceTextView.text = "(${security.LASTCHANGEPRCNT}) $price"
+            } else {
+                binding.wapriceTextView.text = price
+            }
             binding.root.setOnClickListener {
                 listener.onSecurityDetail(security)
             }

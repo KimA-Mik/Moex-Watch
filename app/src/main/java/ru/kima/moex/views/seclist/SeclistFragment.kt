@@ -38,6 +38,8 @@ class SeclistFragment : Fragment() {
     private val viewModel: SeclistViewModel by viewModels { factory() }
     private val adapter: SeclistaAdapter by lazy { SeclistaAdapter(viewModel) }
 
+    private var state = State.Loading
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -50,7 +52,7 @@ class SeclistFragment : Fragment() {
         if (decoration != null) {
             binding.securityRecyclerView.addItemDecoration(decoration)
         }
-
+        applyInterfaceState()
         binding.securityRecyclerView.adapter = adapter
         return binding.root
     }
@@ -119,15 +121,45 @@ class SeclistFragment : Fragment() {
 
     private fun updateSecuritiesList(securities: List<Security>) {
         if (securities.isEmpty()) {
-            binding.securityRecyclerView.visibility = GONE
-            binding.securityListProgressBar.visibility = VISIBLE
+            if (state == State.Ready) {
+                state = State.NoResults
+            }
+            applyInterfaceState()
             return
         }
-        binding.securityListProgressBar.visibility = GONE
-        binding.securityRecyclerView.visibility = VISIBLE
+        state = State.Ready
+        applyInterfaceState()
         val diffCallback = SecurityDiffCallback(adapter.securities, securities)
         val diffSecurities = DiffUtil.calculateDiff(diffCallback)
         adapter.securities = securities
         diffSecurities.dispatchUpdatesTo(adapter)
+    }
+
+    private fun applyInterfaceState() {
+        when (state) {
+            State.Loading -> {
+                binding.securityRecyclerView.visibility = GONE
+                binding.noResultsTextView.visibility = GONE
+                binding.securityListProgressBar.visibility = VISIBLE
+            }
+
+            State.Ready -> {
+                binding.securityRecyclerView.visibility = VISIBLE
+                binding.noResultsTextView.visibility = GONE
+                binding.securityListProgressBar.visibility = GONE
+            }
+
+            State.NoResults -> {
+                binding.securityRecyclerView.visibility = GONE
+                binding.noResultsTextView.visibility = VISIBLE
+                binding.securityListProgressBar.visibility = GONE
+            }
+        }
+    }
+
+    private enum class State {
+        Loading,
+        Ready,
+        NoResults
     }
 }

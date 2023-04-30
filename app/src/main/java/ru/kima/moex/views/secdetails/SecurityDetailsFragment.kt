@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RadioButton
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -38,7 +39,7 @@ class SecurityDetailsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         viewModel.SecurityId = args.securityId
         context?.let {
-            viewModel.colorGreen = it.getColor(R.color.ev_green)
+            viewModel.colorGreen = it.getColor(R.color.increasing_green)
             viewModel.colorRed = it.getColor(R.color.ev_red)
         }
     }
@@ -118,5 +119,30 @@ class SecurityDetailsFragment : Fragment() {
         binding.candleChart.axisRight.isEnabled = false
         binding.candleChart.legend.isEnabled = true
 
+
+        binding.oneYearRadioButton.setOnClickListener { onRadioButtonClicked(it) }
+        binding.sixMonthsRadioButton.setOnClickListener { onRadioButtonClicked(it) }
     }
+
+    private fun onRadioButtonClicked(view: View) {
+        if (view !is RadioButton)
+            return
+        // Is the button now checked?
+        val checked = view.isChecked
+
+        // Check which radio button was clicked
+        when (view.getId()) {
+            R.id.one_year_radio_button ->
+                if (checked) {
+                    viewModel.timeSpan = SecurityDetailsViewModel.TimeSpan.YEAR
+                }
+
+            R.id.six_months_radio_button ->
+                if (checked) {
+                    viewModel.timeSpan = SecurityDetailsViewModel.TimeSpan.SIX_MONTHS
+                }
+        }
+
+    }
+
 }
