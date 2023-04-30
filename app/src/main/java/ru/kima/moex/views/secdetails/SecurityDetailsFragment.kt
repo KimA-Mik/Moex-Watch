@@ -88,6 +88,16 @@ class SecurityDetailsFragment : Fragment() {
                         binding.candleChart.invalidate()
                     }
                 }
+
+                launch {
+                    viewModel.favorite.collect { isFavorite ->
+                        if (isFavorite) {
+                            binding.favoriteButton.setBackgroundResource(R.drawable.ic_favorite)
+                        } else {
+                            binding.favoriteButton.setBackgroundResource(R.drawable.ic_favorite_border)
+                        }
+                    }
+                }
             }
         }
         binding.secId.text = viewModel.SecurityId
@@ -122,6 +132,7 @@ class SecurityDetailsFragment : Fragment() {
 
         binding.oneYearRadioButton.setOnClickListener { onRadioButtonClicked(it) }
         binding.sixMonthsRadioButton.setOnClickListener { onRadioButtonClicked(it) }
+        binding.favoriteButton.setOnClickListener { viewModel.changeFavoriteStatue() }
     }
 
     private fun onRadioButtonClicked(view: View) {

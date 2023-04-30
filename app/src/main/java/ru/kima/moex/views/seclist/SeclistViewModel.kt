@@ -6,12 +6,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.kima.moex.model.DatabaseSecurityService
 import ru.kima.moex.model.Security
 import ru.kima.moex.model.SecurityService
 import ru.kima.moex.views.Event
 
 class SeclistViewModel(
-    private val securityService: SecurityService
+    private val securityService: SecurityService,
+    private val database: DatabaseSecurityService
 ) : ViewModel(), SecurityActionListener {
     private var tempData = emptyList<Security>()
     private val _data = MutableStateFlow<List<Security>>(emptyList())

@@ -15,11 +15,11 @@ class ViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val viewModel = when (modelClass) {
             SeclistViewModel::class.java -> {
-                SeclistViewModel(app.securityService)
+                SeclistViewModel(app.securityService, app.databaseService)
             }
 
             SecurityDetailsViewModel::class.java -> {
-                SecurityDetailsViewModel(app.securityService)
+                SecurityDetailsViewModel(app.securityService, app.databaseService)
             }
 
             else -> {

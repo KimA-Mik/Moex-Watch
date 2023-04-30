@@ -5,4 +5,5 @@
     <string name="no_search_results">No search results</string>
     <string name="one_year_button_text">1 year</string>
     <string name="six_months_button_text">6 months</string>
+    <string name="favorite_button_content_description">Button that indicates wheather current security is in favorite list or not. Pressing change that state</string>
 </resources>

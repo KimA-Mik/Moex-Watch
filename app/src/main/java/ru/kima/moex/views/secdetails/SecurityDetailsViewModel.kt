@@ -13,7 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.kima.moex.model.DatabaseSecurityService
 import ru.kima.moex.model.SecurityDayPrice
+import ru.kima.moex.model.SecurityEntity
 import ru.kima.moex.model.SecurityService
 import ru.kima.moex.views.MAGIC_DAYS
 import ru.kima.moex.views.MILLISECONDS_IN_DAY
@@ -21,18 +23,24 @@ import java.util.Calendar
 import java.util.Date
 
 class SecurityDetailsViewModel(
-    private val securityService: SecurityService
+    private val securityService: SecurityService,
+    private val database: DatabaseSecurityService
 ) : ViewModel() {
     var SecurityId: String = String()
         set(value) {
-            field = value
-            loadData()
+            if (field != value) {
+                field = value
+                loadData()
+            }
         }
     private var allPriceData = listOf<SecurityDayPrice>()
     private val _priceData = MutableStateFlow<List<SecurityDayPrice>>(emptyList())
     val priceData = _priceData.asStateFlow()
     private val _candleData = MutableStateFlow(CandleData())
     val candleData = _candleData.asStateFlow()
+    private val _favorite = MutableStateFlow(false)
+    val favorite = _favorite.asStateFlow()
+    private var securityEntity: SecurityEntity? = null
 
     @ColorInt
     var colorGreen = 0
@@ -59,7 +67,21 @@ class SecurityDetailsViewModel(
         updateDateList()
     }
 
+    fun changeFavoriteStatue() = viewModelScope.launch(Dispatchers.IO) {
+        if (_favorite.value) {
+            database.deleteFromFavorite(SecurityId)
+            _favorite.value = false
+        } else {
+            if (securityEntity == null) {
+                securityEntity = SecurityEntity(0, SecurityId)
+            }
+            database.addToFavorite(securityEntity!!)
+            _favorite.value = true
+        }
+    }
+
     private fun loadData() = viewModelScope.launch(Dispatchers.IO) {
+        _favorite.value = database.isSecurityFavorite(SecurityId)
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DATE, -DAYS_IN_YEAR)
         val date = calendar.time
