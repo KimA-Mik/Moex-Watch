@@ -14,7 +14,7 @@ import ru.kima.moex.views.Event
 class SeclistViewModel(
     private val securityService: SecurityService,
     private val database: DatabaseSecurityService
-) : ViewModel(), SecurityActionListener {
+) : ViewModel(), SecurityActionListener, SeclistMenuListener {
     private var tempData = emptyList<Security>()
     private val _data = MutableStateFlow<List<Security>>(emptyList())
     val data = _data.asStateFlow()
@@ -38,7 +38,7 @@ class SeclistViewModel(
         _showDetails.value = Event(security)
     }
 
-    fun queryString(query: String?) {
+    override fun onQueryString(query: String?) {
         _showFavorite.value = false
         if (query.isNullOrBlank()) {
             _data.value = tempData
@@ -48,17 +48,19 @@ class SeclistViewModel(
             tempData.filter { it.SECID.contains(query, true) || it.SECNAME.contains(query, true) }
     }
 
-    fun changeFavoriteStatue() = viewModelScope.launch {
-        if (_showFavorite.value) {
-            _showFavorite.value = false
-            _data.value = tempData
-        } else {
-            database.getAllFavorites().collect { favorites ->
-                _showFavorite.value = true
-                _data.value =
-                    tempData.filter { (SECID) ->
-                        favorites.any { entity -> entity.SECID == SECID }
-                    }
+    override fun onFavoriteChange() {
+        viewModelScope.launch {
+            if (_showFavorite.value) {
+                _showFavorite.value = false
+                _data.value = tempData
+            } else {
+                database.getAllFavorites().collect { favorites ->
+                    _showFavorite.value = true
+                    _data.value =
+                        tempData.filter { (SECID) ->
+                            favorites.any { entity -> entity.SECID == SECID }
+                        }
+                }
             }
         }
     }

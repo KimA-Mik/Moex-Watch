@@ -2,16 +2,11 @@ package ru.kima.moex.views.seclist
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -21,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
-import ru.kima.moex.R
 import ru.kima.moex.databinding.FragmentSecuritiesListBinding
 import ru.kima.moex.model.Security
 import ru.kima.moex.views.factory
@@ -35,12 +29,13 @@ class SeclistFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private val menuProvider = SeclistMenuProvider()
-
     private val viewModel: SeclistViewModel by viewModels { factory() }
+
     private val adapter: SeclistaAdapter by lazy { SeclistaAdapter(viewModel) }
+    private val menuProvider: SeclistMenuProvider by lazy { SeclistMenuProvider(viewModel) }
 
     private var state = State.Loading
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -140,54 +135,5 @@ class SeclistFragment : Fragment() {
         Loading,
         Ready,
         NoResults
-    }
-
-    inner class SeclistMenuProvider() : MenuProvider {
-
-        private lateinit var favoriteCheckbox: MenuItem
-        private var isFavoriteCheckboxChecked = false
-        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(R.menu.fragment_securities_list_menu, menu)
-
-            favoriteCheckbox = menu.findItem(R.id.menu_show_favorite)
-            favoriteCheckbox.isChecked = isFavoriteCheckboxChecked
-
-            val search = menu.findItem(R.id.menu_item_search)
-            val searchView = search?.actionView as SearchView
-            searchView.apply {
-                isSubmitButtonEnabled = true
-                setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        viewModel.queryString(newText)
-                        return true
-                    }
-
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        viewModel.queryString(query)
-                        return true
-                    }
-                })
-            }
-
-        }
-
-        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-            return when (menuItem.itemId) {
-                R.id.menu_show_favorite -> {
-                    viewModel.changeFavoriteStatue()
-                    true
-                }
-
-                else -> false
-            }
-        }
-
-        fun setFavoriteCheckbox(flag: Boolean) {
-            if (this::favoriteCheckbox.isInitialized)
-                favoriteCheckbox.isChecked = flag
-            else
-                isFavoriteCheckboxChecked = flag
-
-        }
     }
 }
