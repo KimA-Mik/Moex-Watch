@@ -22,11 +22,14 @@ class SeclistViewModel(
     private val _showDetails = MutableStateFlow<Event<Security?>>(Event(null))
     val showDetails = _showDetails.asStateFlow()
 
+    private val _showFavorite = MutableStateFlow<Boolean>(false)
+    val showFavorite = _showFavorite.asStateFlow()
+
     init {
         loadData()
     }
 
-    fun loadData() = viewModelScope.launch(Dispatchers.IO) {
+    private fun loadData() = viewModelScope.launch(Dispatchers.IO) {
         _data.value = securityService.fetchSecurities()
         tempData = _data.value
     }
@@ -36,11 +39,27 @@ class SeclistViewModel(
     }
 
     fun queryString(query: String?) {
+        _showFavorite.value = false
         if (query.isNullOrBlank()) {
             _data.value = tempData
             return
         }
         _data.value =
             tempData.filter { it.SECID.contains(query, true) || it.SECNAME.contains(query, true) }
+    }
+
+    fun changeFavoriteStatue() = viewModelScope.launch {
+        if (_showFavorite.value) {
+            _showFavorite.value = false
+            _data.value = tempData
+        } else {
+            database.getAllFavorites().collect { favorites ->
+                _showFavorite.value = true
+                _data.value =
+                    tempData.filter { (SECID) ->
+                        favorites.any { entity -> entity.SECID == SECID }
+                    }
+            }
+        }
     }
 }

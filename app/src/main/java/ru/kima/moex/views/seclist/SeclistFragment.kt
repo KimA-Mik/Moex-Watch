@@ -35,6 +35,8 @@ class SeclistFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
+    private val menuProvider = SeclistMenuProvider()
+
     private val viewModel: SeclistViewModel by viewModels { factory() }
     private val adapter: SeclistaAdapter by lazy { SeclistaAdapter(viewModel) }
 
@@ -62,8 +64,13 @@ class SeclistFragment : Fragment() {
         _binding = null
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -71,6 +78,7 @@ class SeclistFragment : Fragment() {
                         updateSecuritiesList(securities)
                     }
                 }
+
                 launch {
                     viewModel.showDetails.collect { navEvent ->
                         navEvent.getValue()?.let { security ->
@@ -80,43 +88,14 @@ class SeclistFragment : Fragment() {
                         }
                     }
                 }
+
+                launch {
+                    viewModel.showFavorite.collect { showFavoriteSelected ->
+                        menuProvider.setFavoriteCheckbox(showFavoriteSelected)
+                    }
+                }
             }
         }
-
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.fragment_securities_list_menu, menu)
-                val search = menu.findItem(R.id.menu_item_search)
-                val searchView = search?.actionView as SearchView
-                searchView.apply {
-                    isSubmitButtonEnabled = true
-                    setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                        override fun onQueryTextChange(newText: String?): Boolean {
-                            viewModel.queryString(newText)
-                            return true
-                        }
-
-                        override fun onQueryTextSubmit(query: String?): Boolean {
-                            viewModel.queryString(query)
-                            return true
-                        }
-                    })
-                }
-
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.menu_item_search -> {
-
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun updateSecuritiesList(securities: List<Security>) {
@@ -161,5 +140,54 @@ class SeclistFragment : Fragment() {
         Loading,
         Ready,
         NoResults
+    }
+
+    inner class SeclistMenuProvider() : MenuProvider {
+
+        private lateinit var favoriteCheckbox: MenuItem
+        private var isFavoriteCheckboxChecked = false
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.fragment_securities_list_menu, menu)
+
+            favoriteCheckbox = menu.findItem(R.id.menu_show_favorite)
+            favoriteCheckbox.isChecked = isFavoriteCheckboxChecked
+
+            val search = menu.findItem(R.id.menu_item_search)
+            val searchView = search?.actionView as SearchView
+            searchView.apply {
+                isSubmitButtonEnabled = true
+                setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        viewModel.queryString(newText)
+                        return true
+                    }
+
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        viewModel.queryString(query)
+                        return true
+                    }
+                })
+            }
+
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+            return when (menuItem.itemId) {
+                R.id.menu_show_favorite -> {
+                    viewModel.changeFavoriteStatue()
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+        fun setFavoriteCheckbox(flag: Boolean) {
+            if (this::favoriteCheckbox.isInitialized)
+                favoriteCheckbox.isChecked = flag
+            else
+                isFavoriteCheckboxChecked = flag
+
+        }
     }
 }
