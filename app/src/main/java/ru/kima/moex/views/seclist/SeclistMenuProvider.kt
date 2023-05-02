@@ -57,8 +57,6 @@ class SeclistMenuProvider(
     fun setFavoriteCheckbox(flag: Boolean) {
         if (this::favoriteCheckbox.isInitialized)
             favoriteCheckbox.isChecked = flag
-        else
-            isFavoriteCheckboxChecked = flag
-
+        isFavoriteCheckboxChecked = flag
     }
 }
