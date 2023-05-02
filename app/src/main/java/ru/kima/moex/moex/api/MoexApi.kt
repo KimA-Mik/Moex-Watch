@@ -17,7 +17,7 @@ interface MoexApi {
         "history/" +
                 "engines/stock/" +
                 "markets/shares/" +
-                "sessions/1/" +
+                "sessions/3/" +
                 "securities/{security}.json"
     )
     suspend fun getSecurityPriceHistoryFrom(

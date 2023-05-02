@@ -41,7 +41,9 @@ class SecurityService {
             val security = Security(
                 SECID = tables[0].data[i]["SECID"].toString(),
                 SECNAME = tables[0].data[i]["SECNAME"].toString(),
-                WAPRICE = tables[1].data[i]["WAPRICE"] as Double
+                WAPRICE = tables[1].data[i]["WAPRICE"] as Double,
+                LASTCHANGE = tables[1].data[i]["LASTCHANGE"] as Double,
+                LASTCHANGEPRCNT = tables[1].data[i]["LASTCHANGEPRCNT"] as Double,
             )
             result += security
         }

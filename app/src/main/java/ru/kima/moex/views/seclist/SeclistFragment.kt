@@ -2,14 +2,11 @@ package ru.kima.moex.views.seclist
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
-import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -19,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
-import ru.kima.moex.R
 import ru.kima.moex.databinding.FragmentSecuritiesListBinding
 import ru.kima.moex.model.Security
 import ru.kima.moex.views.factory
@@ -34,7 +30,12 @@ class SeclistFragment : Fragment() {
         }
 
     private val viewModel: SeclistViewModel by viewModels { factory() }
+
     private val adapter: SeclistaAdapter by lazy { SeclistaAdapter(viewModel) }
+    private val menuProvider: SeclistMenuProvider by lazy { SeclistMenuProvider(viewModel) }
+
+    private var state = State.Loading
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,10 +49,7 @@ class SeclistFragment : Fragment() {
         if (decoration != null) {
             binding.securityRecyclerView.addItemDecoration(decoration)
         }
-        binding.updateButton.setOnClickListener() {
-            viewModel.loadData()
-        }
-
+        applyInterfaceState()
         binding.securityRecyclerView.adapter = adapter
         return binding.root
     }
@@ -61,8 +59,13 @@ class SeclistFragment : Fragment() {
         _binding = null
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -70,6 +73,7 @@ class SeclistFragment : Fragment() {
                         updateSecuritiesList(securities)
                     }
                 }
+
                 launch {
                     viewModel.showDetails.collect { navEvent ->
                         navEvent.getValue()?.let { security ->
@@ -79,49 +83,57 @@ class SeclistFragment : Fragment() {
                         }
                     }
                 }
+
+                launch {
+                    viewModel.showFavorite.collect { showFavoriteSelected ->
+                        menuProvider.setFavoriteCheckbox(showFavoriteSelected)
+                    }
+                }
             }
         }
-
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.fragment_securities_list_menu, menu)
-                val search = menu.findItem(R.id.menu_item_search)
-                val searchView = search?.actionView as SearchView
-                searchView.apply {
-                    isSubmitButtonEnabled = true
-                    setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                        override fun onQueryTextChange(newText: String?): Boolean {
-                            viewModel.queryString(newText)
-                            return true
-                        }
-
-                        override fun onQueryTextSubmit(query: String?): Boolean {
-                            viewModel.queryString(query)
-                            return true
-                        }
-                    })
-                }
-
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.menu_item_search -> {
-
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun updateSecuritiesList(securities: List<Security>) {
+        if (securities.isEmpty()) {
+            if (state == State.Ready) {
+                state = State.NoResults
+            }
+            applyInterfaceState()
+            return
+        }
+        state = State.Ready
+        applyInterfaceState()
         val diffCallback = SecurityDiffCallback(adapter.securities, securities)
         val diffSecurities = DiffUtil.calculateDiff(diffCallback)
         adapter.securities = securities
         diffSecurities.dispatchUpdatesTo(adapter)
+    }
+
+    private fun applyInterfaceState() {
+        when (state) {
+            State.Loading -> {
+                binding.securityRecyclerView.visibility = GONE
+                binding.noResultsTextView.visibility = GONE
+                binding.securityListProgressBar.visibility = VISIBLE
+            }
+
+            State.Ready -> {
+                binding.securityRecyclerView.visibility = VISIBLE
+                binding.noResultsTextView.visibility = GONE
+                binding.securityListProgressBar.visibility = GONE
+            }
+
+            State.NoResults -> {
+                binding.securityRecyclerView.visibility = GONE
+                binding.noResultsTextView.visibility = VISIBLE
+                binding.securityListProgressBar.visibility = GONE
+            }
+        }
+    }
+
+    private enum class State {
+        Loading,
+        Ready,
+        NoResults
     }
 }

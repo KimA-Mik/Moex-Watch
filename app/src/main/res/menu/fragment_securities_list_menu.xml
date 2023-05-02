@@ -6,4 +6,10 @@
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_show_favorite"
+        android:checkable="true"
+        android:checked="false"
+        android:title="@string/menu_show_favorite_title"
+        app:showAsAction="collapseActionView" />
 </menu>

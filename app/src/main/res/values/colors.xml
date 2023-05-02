@@ -8,6 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="increasing_green">#7AF254</color>
+
+    <color name="contrast">@color/black</color>
+
     <color name="ev_orange">#E6770B</color>
     <color name="ev_red">#D3290F</color>
     <color name="ev_green">#52D053</color>
