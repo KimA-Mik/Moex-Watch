@@ -98,10 +98,9 @@ class SeclistFragment : Fragment() {
             if (state == State.Ready) {
                 state = State.NoResults
             }
-            applyInterfaceState()
-            return
+        } else {
+            state = State.Ready
         }
-        state = State.Ready
         applyInterfaceState()
         val diffCallback = SecurityDiffCallback(adapter.securities, securities)
         val diffSecurities = DiffUtil.calculateDiff(diffCallback)
