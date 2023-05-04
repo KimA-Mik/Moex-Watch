@@ -61,5 +61,11 @@
             android:layout_height="wrap_content"
             android:text="@string/six_months_button_text" />
 
+        <RadioButton
+            android:id="@+id/one_month_radio_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/one_months_button_text" />
+
     </RadioGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>

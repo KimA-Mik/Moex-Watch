@@ -50,7 +50,8 @@ class SecurityDetailsViewModel(
 
     enum class TimeSpan(val index: Int) {
         YEAR(0),
-        SIX_MONTHS(1)
+        SIX_MONTHS(1),
+        ONE_MONTHS(2)
     }
 
     var timeSpan = TimeSpan.YEAR
@@ -154,10 +155,14 @@ class SecurityDetailsViewModel(
         calendar.add(Calendar.DATE, -(DAYS_IN_YEAR / 2))
         filterOptions.add(calendar.time)
 
+        calendar = Calendar.getInstance()
+        calendar.add(Calendar.DATE, -DAYS_IN_MONTH)
+        filterOptions.add(calendar.time)
     }
 
     companion object {
         private const val DAYS_IN_YEAR = 365
+        private const val DAYS_IN_MONTH = 30
 
     }
 }

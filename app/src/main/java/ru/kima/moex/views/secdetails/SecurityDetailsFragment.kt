@@ -132,6 +132,7 @@ class SecurityDetailsFragment : Fragment() {
 
         binding.oneYearRadioButton.setOnClickListener { onRadioButtonClicked(it) }
         binding.sixMonthsRadioButton.setOnClickListener { onRadioButtonClicked(it) }
+        binding.oneMonthRadioButton.setOnClickListener { onRadioButtonClicked(it) }
         binding.favoriteButton.setOnClickListener { viewModel.changeFavoriteStatue() }
     }
 
@@ -144,16 +145,16 @@ class SecurityDetailsFragment : Fragment() {
         // Check which radio button was clicked
         when (view.getId()) {
             R.id.one_year_radio_button ->
-                if (checked) {
+                if (checked)
                     viewModel.timeSpan = SecurityDetailsViewModel.TimeSpan.YEAR
-                }
 
             R.id.six_months_radio_button ->
-                if (checked) {
+                if (checked)
                     viewModel.timeSpan = SecurityDetailsViewModel.TimeSpan.SIX_MONTHS
-                }
+
+            R.id.one_month_radio_button ->
+                if (checked)
+                    viewModel.timeSpan = SecurityDetailsViewModel.TimeSpan.ONE_MONTHS
         }
-
     }
-
 }

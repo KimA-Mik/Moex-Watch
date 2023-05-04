@@ -7,4 +7,5 @@
     <string name="six_months_button_text">6 months</string>
     <string name="favorite_button_content_description">Button that indicates wheather current security is in favorite list or not. Pressing change that state</string>
     <string name="menu_show_favorite_title">Show favorite</string>
+    <string name="one_months_button_text">1 month</string>
 </resources>
