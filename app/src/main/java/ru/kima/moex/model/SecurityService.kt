@@ -30,6 +30,7 @@ class SecurityService {
     suspend fun fetchSecurities(): List<Security> {
         val response = moexApi.fetchSecurities()
         val tables = MoexResponse.parseFromJson(response)
+        val set = mutableSetOf<String>()
 
         if (tables[0].data.size != tables[1].data.size) {
             throw InvalidResponse()
@@ -38,6 +39,9 @@ class SecurityService {
         for (i in tables[0].data.indices) {
             if ((tables[1].data[i]["WAPRICE"] as Double).isNaN())
                 continue
+            if (set.contains(tables[0].data[i]["SECID"].toString()))
+                continue
+
             val security = Security(
                 SECID = tables[0].data[i]["SECID"].toString(),
                 SECNAME = tables[0].data[i]["SECNAME"].toString(),
@@ -46,6 +50,7 @@ class SecurityService {
                 LASTCHANGEPRCNT = tables[1].data[i]["LASTCHANGEPRCNT"] as Double,
             )
             result += security
+            set.add(security.SECID)
         }
         return result
     }
