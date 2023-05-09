@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="increasing_green">#7AF254</color>
+    <color name="decreasing_red">#FF0D7B</color>
 
     <color name="contrast">@color/black</color>
 
