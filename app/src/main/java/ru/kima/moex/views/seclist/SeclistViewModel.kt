@@ -22,7 +22,7 @@ class SeclistViewModel(
     private val _showDetails = MutableStateFlow<Event<Security?>>(Event(null))
     val showDetails = _showDetails.asStateFlow()
 
-    private val _showFavorite = MutableStateFlow<Boolean>(false)
+    private val _showFavorite = MutableStateFlow(false)
     val showFavorite = _showFavorite.asStateFlow()
 
     init {
@@ -31,7 +31,7 @@ class SeclistViewModel(
 
     private fun loadData() = viewModelScope.launch(Dispatchers.IO) {
         completeData = securityService.fetchSecurities()
-         _data.value = completeData
+        _data.value = completeData
     }
 
     override fun onSecurityDetail(security: Security) {
@@ -45,7 +45,12 @@ class SeclistViewModel(
             return
         }
         _data.value =
-            completeData.filter { it.SECID.contains(query, true) || it.SECNAME.contains(query, true) }
+            completeData.filter {
+                it.SECID.contains(query, true) || it.SECNAME.contains(
+                    query,
+                    true
+                )
+            }
     }
 
     override fun onFavoriteChange() {

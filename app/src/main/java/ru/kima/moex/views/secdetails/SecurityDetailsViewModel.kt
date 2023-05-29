@@ -17,6 +17,7 @@ import ru.kima.moex.model.DatabaseSecurityService
 import ru.kima.moex.model.SecurityDayPrice
 import ru.kima.moex.model.SecurityEntity
 import ru.kima.moex.model.SecurityService
+import ru.kima.moex.views.Event
 import ru.kima.moex.views.MAGIC_DAYS
 import ru.kima.moex.views.MILLISECONDS_IN_DAY
 import java.util.Calendar
@@ -41,6 +42,9 @@ class SecurityDetailsViewModel(
     private val _favorite = MutableStateFlow(false)
     val favorite = _favorite.asStateFlow()
     private var securityEntity: SecurityEntity? = null
+    private val _navigationEvent = MutableStateFlow<Event<SecurityDayPrice?>>(Event(null))
+    val navigationEvent = _navigationEvent.asStateFlow()
+
 
     @ColorInt
     var colorGreen = 0
@@ -79,6 +83,10 @@ class SecurityDetailsViewModel(
             database.addToFavorite(securityEntity!!)
             _favorite.value = true
         }
+    }
+
+    fun showConfig() {
+        _navigationEvent.value = Event(allPriceData.last())
     }
 
     private fun loadData() = viewModelScope.launch(Dispatchers.IO) {

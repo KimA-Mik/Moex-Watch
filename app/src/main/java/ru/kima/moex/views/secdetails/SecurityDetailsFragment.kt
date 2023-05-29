@@ -76,8 +76,12 @@ class SecurityDetailsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    // TODO: remove placeholder
                     viewModel.priceData.collect { priceList ->
+                        if (priceList.isNotEmpty()) {
+                            val price = priceList.last().price
+                            binding.priceTextView.text =
+                                resources.getString(R.string.price, String.format("%.2f", price))
+                        }
                     }
                 }
 
@@ -95,6 +99,19 @@ class SecurityDetailsFragment : Fragment() {
                             binding.favoriteButton.setBackgroundResource(R.drawable.ic_favorite)
                         } else {
                             binding.favoriteButton.setBackgroundResource(R.drawable.ic_favorite_border)
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.navigationEvent.collect { event ->
+                        event.getValue()?.let {
+                            findNavController().navigate(
+                                SecurityDetailsFragmentDirections.showPriceTrackingConfig(
+                                    viewModel.SecurityId,
+                                    it.price.toFloat()
+                                )
+                            )
                         }
                     }
                 }
@@ -134,6 +151,7 @@ class SecurityDetailsFragment : Fragment() {
         binding.sixMonthsRadioButton.setOnClickListener { onRadioButtonClicked(it) }
         binding.oneMonthRadioButton.setOnClickListener { onRadioButtonClicked(it) }
         binding.favoriteButton.setOnClickListener { viewModel.changeFavoriteStatue() }
+        binding.configButton.setOnClickListener { viewModel.showConfig() }
     }
 
     private fun onRadioButtonClicked(view: View) {

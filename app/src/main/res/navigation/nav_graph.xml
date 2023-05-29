@@ -22,5 +22,20 @@
         <argument
             android:name="SecurityId"
             app:argType="string" />
+        <action
+            android:id="@+id/show_price_tracking_config"
+            app:destination="@id/priceConfigFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/priceConfigFragment"
+        android:name="ru.kima.moex.views.priceConfig.PriceConfigFragment"
+        android:label="PriceConfigFragment"
+        tools:layout="@layout/fragment_price_config">
+        <argument
+            android:name="secid"
+            app:argType="string" />
+        <argument
+            android:name="Price"
+            app:argType="float" />
     </fragment>
 </navigation>

@@ -49,6 +49,7 @@ class SecurityService {
                         LASTCHANGEPRCNT = tables[1].data[i]["LASTCHANGEPRCNT"] as Double
                     )
                 }
+                continue
             } else {
                 map[name] = result.size
             }
