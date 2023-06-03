@@ -28,5 +28,9 @@ const val FAVORITE_SECURITIES_TABLE_NAME = "favorite_securities"
 data class SecurityEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
-    val SECID: String
+    val sec_id: String,
+    val sec_name: String,
+    val price: Double,
+    val change_percent: Double,
+    val is_tracked: Boolean
 )

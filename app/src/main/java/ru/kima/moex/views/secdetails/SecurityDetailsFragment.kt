@@ -96,8 +96,10 @@ class SecurityDetailsFragment : Fragment() {
                 launch {
                     viewModel.favorite.collect { isFavorite ->
                         if (isFavorite) {
+                            binding.configButton.isEnabled = true
                             binding.favoriteButton.setBackgroundResource(R.drawable.ic_favorite)
                         } else {
+                            binding.configButton.isEnabled = false
                             binding.favoriteButton.setBackgroundResource(R.drawable.ic_favorite_border)
                         }
                     }

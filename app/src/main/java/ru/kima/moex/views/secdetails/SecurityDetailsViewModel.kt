@@ -78,7 +78,7 @@ class SecurityDetailsViewModel(
             _favorite.value = false
         } else {
             if (securityEntity == null) {
-                securityEntity = SecurityEntity(0, SecurityId)
+                securityEntity = SecurityEntity(0, SecurityId, "", 0.0, 0.0, false)
             }
             database.addToFavorite(securityEntity!!)
             _favorite.value = true

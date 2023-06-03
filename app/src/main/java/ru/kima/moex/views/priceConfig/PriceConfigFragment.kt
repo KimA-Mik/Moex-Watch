@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.fragment.app.Fragment
@@ -11,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.launch
 import ru.kima.moex.databinding.FragmentPriceConfigBinding
@@ -26,6 +28,11 @@ class PriceConfigFragment : Fragment() {
     private val viewModel: PriceConfigViewModel by viewModels { factory() }
 
     private val args: PriceConfigFragmentArgs by navArgs()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.updateSecId(args.secid)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,10 +53,29 @@ class PriceConfigFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.security.collect { security ->
+                        binding.secId.text = security.sec_id
+                        binding.seekBar.progress = security.change_percent.toInt()
+                        binding.percentView.text = security.change_percent.toInt().toString() + "%"
+                        binding.trackCheckBox.isChecked = security.is_tracked
+                    }
+                }
 
+                launch {
+                    viewModel.shouldReturn.collect {
+                        it.getValue()?.let { shouldReturn ->
+                            if (shouldReturn) {
+                                findNavController().navigateUp()
+                            }
+                        }
+                    }
+                }
             }
         }
-        binding.secId.text = args.secid
+
+        binding.saveButton.setOnClickListener { viewModel.onSavePressed() }
+
         binding.priceEdit.setText(String.format("%.2f", args.price))
         binding.seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
@@ -61,8 +87,13 @@ class PriceConfigFragment : Fragment() {
             }
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
-
+                viewModel.updatePercent(p0!!.progress)
             }
         })
+
+        binding.trackCheckBox.setOnClickListener {
+            val checkBox = it as CheckBox
+            viewModel.setTracked(checkBox.isChecked)
+        }
     }
 }

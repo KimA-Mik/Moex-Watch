@@ -63,7 +63,7 @@ class SeclistViewModel(
                     _showFavorite.value = true
                     _data.value =
                         completeData.filter { (SECID) ->
-                            favorites.any { entity -> entity.SECID == SECID }
+                            favorites.any { entity -> entity.sec_id == SECID }
                         }
                 }
             }

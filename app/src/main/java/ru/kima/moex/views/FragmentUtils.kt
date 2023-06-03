@@ -24,7 +24,7 @@ class ViewModelFactory(
             }
 
             PriceConfigViewModel::class.java -> {
-                PriceConfigViewModel()
+                PriceConfigViewModel(app.databaseService)
             }
 
             else -> {
