@@ -35,7 +35,7 @@ class SecurityDetailsViewModel(
             }
         }
     private var allPriceData = listOf<SecurityDayPrice>()
-    private val _priceData = MutableStateFlow<List<SecurityDayPrice>>(emptyList())
+    private val _priceData = MutableStateFlow<SecurityEntity?>(null)
     val priceData = _priceData.asStateFlow()
     private val _candleData = MutableStateFlow(CandleData())
     val candleData = _candleData.asStateFlow()
@@ -78,7 +78,11 @@ class SecurityDetailsViewModel(
             _favorite.value = false
         } else {
             if (securityEntity == null) {
-                securityEntity = SecurityEntity(0, SecurityId, "", 0.0, 0.0, false)
+                securityEntity = if (_priceData.value != null) {
+                    SecurityEntity(0, SecurityId, _priceData.value!!.sec_name, _priceData.value!!.price, 0.0, false)
+                } else {
+                    SecurityEntity(0, SecurityId, "", 0.0, 0.0, false)
+                }
             }
             database.addToFavorite(securityEntity!!)
             _favorite.value = true
@@ -89,23 +93,28 @@ class SecurityDetailsViewModel(
         _navigationEvent.value = Event(allPriceData.last())
     }
 
-    private fun loadData() = viewModelScope.launch(Dispatchers.IO) {
-        _favorite.value = database.isSecurityFavorite(SecurityId)
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DATE, -DAYS_IN_YEAR)
-        val date = calendar.time
+    private fun loadData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _favorite.value = database.isSecurityFavorite(SecurityId)
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.DATE, -DAYS_IN_YEAR)
+            val date = calendar.time
 
-        _priceData.value = emptyList()
-        val response = securityService.getSecurityPriceHistoryFrom(SecurityId, date)
-        response.collect { responseList ->
-            allPriceData = listOf(allPriceData, responseList).flatten()
-            updateFlows()
+            val response = securityService.getSecurityPriceHistoryFrom(SecurityId, date)
+            response.collect { responseList ->
+                allPriceData = listOf(allPriceData, responseList).flatten()
+                updateFlows()
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = securityService.fetchSecurity(SecurityId)
+            _priceData.value = response
         }
     }
 
     private fun updateFlows() {
-        _priceData.value = allPriceData.filter { filterOptions[timeSpan.index].before(it.date) }
-        updateCandleData(_priceData.value)
+        updateCandleData(allPriceData.filter { filterOptions[timeSpan.index].before(it.date) })
     }
 
     private fun updateCandleData(priceData: List<SecurityDayPrice>) {

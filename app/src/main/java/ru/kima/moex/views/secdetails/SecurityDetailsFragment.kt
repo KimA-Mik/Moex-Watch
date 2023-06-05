@@ -76,11 +76,11 @@ class SecurityDetailsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.priceData.collect { priceList ->
-                        if (priceList.isNotEmpty()) {
-                            val price = priceList.last().price
+                    viewModel.priceData.collect { price->
+                        price?.let {
                             binding.priceTextView.text =
-                                resources.getString(R.string.price, String.format("%.2f", price))
+                                resources.getString(R.string.price, String.format("%.2f", it.price))
+                            binding.securityNameTextView.text = it.sec_name
                         }
                     }
                 }

@@ -59,6 +59,7 @@ class PriceConfigFragment : Fragment() {
                         binding.seekBar.progress = security.change_percent.toInt()
                         binding.percentView.text = security.change_percent.toInt().toString() + "%"
                         binding.trackCheckBox.isChecked = security.is_tracked
+                        binding.securityNameTextView.text = security.sec_name
                     }
                 }
 
