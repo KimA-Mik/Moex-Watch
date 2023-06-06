@@ -40,6 +40,7 @@ class SecurityService {
             if ((tables[1].data[i]["WAPRICE"] as Double).isNaN())
                 continue
 
+
             val name = tables[0].data[i]["SECID"].toString()
             if (map.contains(name)) {
                 val index = map[name]!!
