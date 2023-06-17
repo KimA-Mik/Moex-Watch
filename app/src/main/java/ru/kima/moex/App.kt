@@ -7,4 +7,9 @@ import ru.kima.moex.model.SecurityService
 class App : Application() {
     val securityService = SecurityService()
     val databaseService by lazy { DatabaseSecurityService(applicationContext) }
+
+    override fun onCreate() {
+        super.onCreate()
+        ResourceProvider.initialize(this)
+    }
 }

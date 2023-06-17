@@ -35,4 +35,10 @@ class DatabaseSecurityService(
 
     suspend fun isSecurityFavorite(secId: String): Boolean =
         favoriteSecurityDatabase.favoriteSecurityDao().isSecurityFavorite(secId)
+
+    suspend fun updateSecurity(securityEntity: SecurityEntity) =
+        favoriteSecurityDatabase.favoriteSecurityDao().updateSecurity(securityEntity)
+
+    suspend fun getSecurityBySecId(secId: String) =
+        favoriteSecurityDatabase.favoriteSecurityDao().getSecurityBySecId(secId)
 }

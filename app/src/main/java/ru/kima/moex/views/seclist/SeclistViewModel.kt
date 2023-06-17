@@ -15,14 +15,14 @@ class SeclistViewModel(
     private val securityService: SecurityService,
     private val database: DatabaseSecurityService
 ) : ViewModel(), SecurityActionListener, SeclistMenuListener {
-    private var tempData = emptyList<Security>()
+    private var completeData = emptyList<Security>()
     private val _data = MutableStateFlow<List<Security>>(emptyList())
     val data = _data.asStateFlow()
 
     private val _showDetails = MutableStateFlow<Event<Security?>>(Event(null))
     val showDetails = _showDetails.asStateFlow()
 
-    private val _showFavorite = MutableStateFlow<Boolean>(false)
+    private val _showFavorite = MutableStateFlow(false)
     val showFavorite = _showFavorite.asStateFlow()
 
     init {
@@ -30,8 +30,8 @@ class SeclistViewModel(
     }
 
     private fun loadData() = viewModelScope.launch(Dispatchers.IO) {
-        _data.value = securityService.fetchSecurities()
-        tempData = _data.value
+        completeData = securityService.fetchSecurities()
+        _data.value = completeData
     }
 
     override fun onSecurityDetail(security: Security) {
@@ -41,24 +41,29 @@ class SeclistViewModel(
     override fun onQueryString(query: String?) {
         _showFavorite.value = false
         if (query.isNullOrBlank()) {
-            _data.value = tempData
+            _data.value = completeData
             return
         }
         _data.value =
-            tempData.filter { it.SECID.contains(query, true) || it.SECNAME.contains(query, true) }
+            completeData.filter {
+                it.SECID.contains(query, true) || it.SECNAME.contains(
+                    query,
+                    true
+                )
+            }
     }
 
     override fun onFavoriteChange() {
         viewModelScope.launch {
             if (_showFavorite.value) {
                 _showFavorite.value = false
-                _data.value = tempData
+                _data.value = completeData
             } else {
                 database.getAllFavorites().collect { favorites ->
                     _showFavorite.value = true
                     _data.value =
-                        tempData.filter { (SECID) ->
-                            favorites.any { entity -> entity.SECID == SECID }
+                        completeData.filter { (SECID) ->
+                            favorites.any { entity -> entity.sec_id == SECID }
                         }
                 }
             }

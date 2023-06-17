@@ -76,8 +76,12 @@ class SecurityDetailsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    // TODO: remove placeholder
-                    viewModel.priceData.collect { priceList ->
+                    viewModel.priceData.collect { price->
+                        price?.let {
+                            binding.priceTextView.text =
+                                resources.getString(R.string.price, String.format("%.2f", it.price))
+                            binding.securityNameTextView.text = it.sec_name
+                        }
                     }
                 }
 
@@ -92,9 +96,24 @@ class SecurityDetailsFragment : Fragment() {
                 launch {
                     viewModel.favorite.collect { isFavorite ->
                         if (isFavorite) {
+                            binding.configButton.isEnabled = true
                             binding.favoriteButton.setBackgroundResource(R.drawable.ic_favorite)
                         } else {
+                            binding.configButton.isEnabled = false
                             binding.favoriteButton.setBackgroundResource(R.drawable.ic_favorite_border)
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.navigationEvent.collect { event ->
+                        event.getValue()?.let {
+                            findNavController().navigate(
+                                SecurityDetailsFragmentDirections.showPriceTrackingConfig(
+                                    viewModel.SecurityId,
+                                    it.price.toFloat()
+                                )
+                            )
                         }
                     }
                 }
@@ -132,7 +151,9 @@ class SecurityDetailsFragment : Fragment() {
 
         binding.oneYearRadioButton.setOnClickListener { onRadioButtonClicked(it) }
         binding.sixMonthsRadioButton.setOnClickListener { onRadioButtonClicked(it) }
+        binding.oneMonthRadioButton.setOnClickListener { onRadioButtonClicked(it) }
         binding.favoriteButton.setOnClickListener { viewModel.changeFavoriteStatue() }
+        binding.configButton.setOnClickListener { viewModel.showConfig() }
     }
 
     private fun onRadioButtonClicked(view: View) {
@@ -144,16 +165,16 @@ class SecurityDetailsFragment : Fragment() {
         // Check which radio button was clicked
         when (view.getId()) {
             R.id.one_year_radio_button ->
-                if (checked) {
+                if (checked)
                     viewModel.timeSpan = SecurityDetailsViewModel.TimeSpan.YEAR
-                }
 
             R.id.six_months_radio_button ->
-                if (checked) {
+                if (checked)
                     viewModel.timeSpan = SecurityDetailsViewModel.TimeSpan.SIX_MONTHS
-                }
+
+            R.id.one_month_radio_button ->
+                if (checked)
+                    viewModel.timeSpan = SecurityDetailsViewModel.TimeSpan.ONE_MONTHS
         }
-
     }
-
 }

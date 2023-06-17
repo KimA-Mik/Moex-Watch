@@ -98,10 +98,9 @@ class SeclistFragment : Fragment() {
             if (state == State.Ready) {
                 state = State.NoResults
             }
-            applyInterfaceState()
-            return
+        } else {
+            state = State.Ready
         }
-        state = State.Ready
         applyInterfaceState()
         val diffCallback = SecurityDiffCallback(adapter.securities, securities)
         val diffSecurities = DiffUtil.calculateDiff(diffCallback)
@@ -112,19 +111,16 @@ class SeclistFragment : Fragment() {
     private fun applyInterfaceState() {
         when (state) {
             State.Loading -> {
-                binding.securityRecyclerView.visibility = GONE
                 binding.noResultsTextView.visibility = GONE
                 binding.securityListProgressBar.visibility = VISIBLE
             }
 
             State.Ready -> {
-                binding.securityRecyclerView.visibility = VISIBLE
                 binding.noResultsTextView.visibility = GONE
                 binding.securityListProgressBar.visibility = GONE
             }
 
             State.NoResults -> {
-                binding.securityRecyclerView.visibility = GONE
                 binding.noResultsTextView.visibility = VISIBLE
                 binding.securityListProgressBar.visibility = GONE
             }

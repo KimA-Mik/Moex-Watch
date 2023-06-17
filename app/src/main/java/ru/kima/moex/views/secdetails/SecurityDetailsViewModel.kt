@@ -17,6 +17,7 @@ import ru.kima.moex.model.DatabaseSecurityService
 import ru.kima.moex.model.SecurityDayPrice
 import ru.kima.moex.model.SecurityEntity
 import ru.kima.moex.model.SecurityService
+import ru.kima.moex.views.Event
 import ru.kima.moex.views.MAGIC_DAYS
 import ru.kima.moex.views.MILLISECONDS_IN_DAY
 import java.util.Calendar
@@ -34,13 +35,16 @@ class SecurityDetailsViewModel(
             }
         }
     private var allPriceData = listOf<SecurityDayPrice>()
-    private val _priceData = MutableStateFlow<List<SecurityDayPrice>>(emptyList())
+    private val _priceData = MutableStateFlow<SecurityEntity?>(null)
     val priceData = _priceData.asStateFlow()
     private val _candleData = MutableStateFlow(CandleData())
     val candleData = _candleData.asStateFlow()
     private val _favorite = MutableStateFlow(false)
     val favorite = _favorite.asStateFlow()
     private var securityEntity: SecurityEntity? = null
+    private val _navigationEvent = MutableStateFlow<Event<SecurityDayPrice?>>(Event(null))
+    val navigationEvent = _navigationEvent.asStateFlow()
+
 
     @ColorInt
     var colorGreen = 0
@@ -50,7 +54,8 @@ class SecurityDetailsViewModel(
 
     enum class TimeSpan(val index: Int) {
         YEAR(0),
-        SIX_MONTHS(1)
+        SIX_MONTHS(1),
+        ONE_MONTHS(2)
     }
 
     var timeSpan = TimeSpan.YEAR
@@ -73,30 +78,43 @@ class SecurityDetailsViewModel(
             _favorite.value = false
         } else {
             if (securityEntity == null) {
-                securityEntity = SecurityEntity(0, SecurityId)
+                securityEntity = if (_priceData.value != null) {
+                    SecurityEntity(0, SecurityId, _priceData.value!!.sec_name, _priceData.value!!.price, 0.0, false)
+                } else {
+                    SecurityEntity(0, SecurityId, "", 0.0, 0.0, false)
+                }
             }
             database.addToFavorite(securityEntity!!)
             _favorite.value = true
         }
     }
 
-    private fun loadData() = viewModelScope.launch(Dispatchers.IO) {
-        _favorite.value = database.isSecurityFavorite(SecurityId)
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DATE, -DAYS_IN_YEAR)
-        val date = calendar.time
+    fun showConfig() {
+        _navigationEvent.value = Event(allPriceData.last())
+    }
 
-        _priceData.value = emptyList()
-        val response = securityService.getSecurityPriceHistoryFrom(SecurityId, date)
-        response.collect { responseList ->
-            allPriceData = listOf(allPriceData, responseList).flatten()
-            updateFlows()
+    private fun loadData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _favorite.value = database.isSecurityFavorite(SecurityId)
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.DATE, -DAYS_IN_YEAR)
+            val date = calendar.time
+
+            val response = securityService.getSecurityPriceHistoryFrom(SecurityId, date)
+            response.collect { responseList ->
+                allPriceData = listOf(allPriceData, responseList).flatten()
+                updateFlows()
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = securityService.fetchSecurity(SecurityId)
+            _priceData.value = response
         }
     }
 
     private fun updateFlows() {
-        _priceData.value = allPriceData.filter { filterOptions[timeSpan.index].before(it.date) }
-        updateCandleData(_priceData.value)
+        updateCandleData(allPriceData.filter { filterOptions[timeSpan.index].before(it.date) })
     }
 
     private fun updateCandleData(priceData: List<SecurityDayPrice>) {
@@ -154,10 +172,14 @@ class SecurityDetailsViewModel(
         calendar.add(Calendar.DATE, -(DAYS_IN_YEAR / 2))
         filterOptions.add(calendar.time)
 
+        calendar = Calendar.getInstance()
+        calendar.add(Calendar.DATE, -DAYS_IN_MONTH)
+        filterOptions.add(calendar.time)
     }
 
     companion object {
         private const val DAYS_IN_YEAR = 365
+        private const val DAYS_IN_MONTH = 30
 
     }
 }

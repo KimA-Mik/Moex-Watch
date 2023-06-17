@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import ru.kima.moex.App
+import ru.kima.moex.views.priceConfig.PriceConfigViewModel
 import ru.kima.moex.views.secdetails.SecurityDetailsViewModel
 import ru.kima.moex.views.seclist.SeclistViewModel
 
@@ -20,6 +21,10 @@ class ViewModelFactory(
 
             SecurityDetailsViewModel::class.java -> {
                 SecurityDetailsViewModel(app.securityService, app.databaseService)
+            }
+
+            PriceConfigViewModel::class.java -> {
+                PriceConfigViewModel(app.databaseService)
             }
 
             else -> {

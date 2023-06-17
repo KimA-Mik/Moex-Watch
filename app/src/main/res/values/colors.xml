@@ -8,7 +8,28 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="increasing_green">#7AF254</color>
+    <color name="red_800">#ee0202</color>
+    <color name="red_700">#d82933</color>    <!-- Color Primary Variant -->
+    <color name="red_600">#ea3339</color>
+    <color name="red_500">#fa3e3a</color>    <!-- Color Primary -->
+    <color name="red_400">#f45054</color>
+    <color name="red_300">#e97276</color>
+    <color name="red_200">#f19a9c</color>
+    <color name="red_100">#ffcdd4</color>
+
+    <color name="cyan_700">#00bac4</color>    <!-- Color Secondary Variant -->
+    <color name="cyan_600">#00d1e1</color>
+    <color name="cyan_500">#00e2f5</color>
+    <color name="cyan_400">#00e9f5</color>
+    <color name="cyan_300">#00f0f8</color>
+    <color name="cyan_200">#02eeee</color>    <!-- Color Secondary -->
+
+    <color name="green_400">#3afa3e</color>
+
+    <color name="increasing_green">@color/green_400</color>
+    <color name="decreasing_red">@color/red_600</color>
+    <!--    <color name="increasing_green">#7AF254</color>-->
+    <!--    <color name="decreasing_red">#FF0D7B</color>-->
 
     <color name="contrast">@color/black</color>
 
