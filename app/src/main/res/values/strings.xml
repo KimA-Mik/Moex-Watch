@@ -1,17 +1,23 @@
 <resources>
-    <string name="app_name">Moex Watch</string>
-    <string name="update_button_text">Update</string>
+    <string name="app_name" translatable="false">Moex Watch</string>
     <string name="search">Search</string>
     <string name="no_search_results">No search results</string>
     <string name="one_year_button_text">1 year</string>
     <string name="six_months_button_text">6 months</string>
-    <string name="favorite_button_content_description">Button that indicates wheather current security is in favorite list or not. Pressing change that state</string>
+    <string name="favorite_button_content_description" translatable="false">Button that indicates whether current security is in favorite list or not. Pressing change that state</string>
     <string name="menu_show_favorite_title">Show favorite</string>
     <string name="one_months_button_text">1 month</string>
     <string name="percent_price"></string>
     <string name="rouble">₽</string>
-    <string name="price">%1$s ₽</string>
+    <string name="price" translatable="false">%1$s ₽</string>
     <string name="config_button_text">Price tracking</string>
     <string name="save_button_text">save</string>
     <string name="track_check_box_text">Track</string>
+
+    <string name="channel_name">Primary Channel</string>
+    <string name="channel_description">Primary Notification Channel</string>
+    <string name="no_notifications_toast">This will be requested later</string>
+    <string name="notification_price_changed_title">Price changed</string>
+    <string name="notification_price_increased_body">%1$s price increased by %2$d%</string>
+    <string name="notification_price_decreased_body">%1$s price decreased by %2$d%</string>
 </resources>

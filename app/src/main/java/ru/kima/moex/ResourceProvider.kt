@@ -26,6 +26,10 @@ class ResourceProvider private constructor(context: Context) {
         return intColor
     }
 
+    fun getString(stringId: Int): String {
+        return resources.getString(stringId)
+    }
+
     private var theme: Theme
     private val resources: Resources
 

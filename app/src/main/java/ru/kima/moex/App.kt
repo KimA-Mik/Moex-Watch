@@ -11,5 +11,6 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         ResourceProvider.initialize(this)
+        NotificationController.initialize(this)
     }
 }
