@@ -7,6 +7,6 @@
     <string name="no_search_results">Нет результатов</string>
 
     <string name="notification_price_changed_title">Изменение цены</string>
-    <string name="notification_price_increased_body">Цена на %1$s увеличилась на %2$d%</string>
-    <string name="notification_price_decreased_body">Цена на %1$s уменьшилась на %2$d%</string>
+    <string name="notification_price_increased_body">Цена на %1$s увеличилась на %2$.2f%% до %3$.2f₽</string>
+    <string name="notification_price_decreased_body">Цена на %1$s уменьшилась на %2$.2f%% до %3$.2f₽</string>
 </resources>

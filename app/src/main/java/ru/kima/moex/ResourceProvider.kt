@@ -30,6 +30,10 @@ class ResourceProvider private constructor(context: Context) {
         return resources.getString(stringId)
     }
 
+    fun getString(stringId: Int,  vararg formatArgs: Any) : String {
+        return resources.getString(stringId, *formatArgs)
+    }
+
     private var theme: Theme
     private val resources: Resources
 

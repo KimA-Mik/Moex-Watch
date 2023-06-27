@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.kima.moex.NotificationController
 import ru.kima.moex.model.DatabaseSecurityService
 import ru.kima.moex.model.Security
 import ru.kima.moex.model.SecurityService
@@ -35,6 +36,8 @@ class SeclistViewModel(
     }
 
     override fun onSecurityDetail(security: Security) {
+        NotificationController.getInstance()
+            .sendPriceChangedNotification(security.SECID, security.LASTCHANGE, security.WAPRICE)
         _showDetails.value = Event(security)
     }
 

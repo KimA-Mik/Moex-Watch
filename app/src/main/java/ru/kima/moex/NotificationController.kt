@@ -3,6 +3,7 @@ package ru.kima.moex
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -10,19 +11,29 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.os.bundleOf
+import androidx.navigation.NavDeepLinkBuilder
+import kotlin.math.absoluteValue
 import kotlin.random.Random
+
 
 private const val PRIMARY_CHANNEL_ID = "PRIMARY"
 
 class NotificationController private constructor(val context: Context) {
     private var builder: NotificationCompat.Builder
+    private var intentBuilder: NavDeepLinkBuilder
 
     init {
         createNotificationChannel(context)
         builder = NotificationCompat.Builder(context, PRIMARY_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_price_change)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
 
+        intentBuilder = NavDeepLinkBuilder(context)
+            .setComponentName(MainActivity::class.java)
+            .setGraph(R.navigation.nav_graph)
+            .setDestination(R.id.securityDetailsFragment)
     }
 
     private fun createNotificationChannel(context: Context) {
@@ -45,9 +56,28 @@ class NotificationController private constructor(val context: Context) {
         }
     }
 
-    fun sendNotification(title: String, text: String) {
+    fun sendPriceChangedNotification(secId: String, percent: Double, curPrice: Double) {
+        val bundle = bundleOf(Pair("SecurityId", secId))
+        intentBuilder.setArguments(bundle)
+        val provider = ResourceProvider.getInstance()
+
+        val body = if (percent > 0.0)
+            provider.getString(R.string.notification_price_increased_body, secId, percent, curPrice)
+        else
+            provider.getString(R.string.notification_price_decreased_body, secId, percent.absoluteValue, curPrice)
+
+        sendNotification(
+            provider.getString(R.string.notification_price_changed_title),
+            body,
+            intentBuilder.createPendingIntent()
+        )
+
+    }
+
+    fun sendNotification(title: String, text: String, intent: PendingIntent? = null) {
         builder.setContentTitle(title)
         builder.setContentText(text)
+        builder.setContentIntent(intent)
 
         with(NotificationManagerCompat.from(context)) {
             // notificationId is a unique int for each notification that you must define

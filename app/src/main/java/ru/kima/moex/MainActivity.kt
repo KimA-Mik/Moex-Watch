@@ -45,8 +45,6 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-        NotificationController.getInstance()
-            .sendNotification("Изменение цены", "Цена на SBER увеличилась на 12.51%")
     }
 }
 
