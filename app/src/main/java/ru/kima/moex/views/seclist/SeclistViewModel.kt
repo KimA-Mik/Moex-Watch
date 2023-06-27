@@ -30,7 +30,7 @@ class SeclistViewModel(
         loadData()
     }
 
-    private fun loadData() = viewModelScope.launch(Dispatchers.IO) {
+    fun loadData() = viewModelScope.launch(Dispatchers.IO) {
         completeData = securityService.fetchSecurities()
         _data.value = completeData
     }

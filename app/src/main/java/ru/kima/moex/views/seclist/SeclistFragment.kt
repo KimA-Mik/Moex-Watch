@@ -65,11 +65,13 @@ class SeclistFragment : Fragment() {
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        binding.swipeLayout.setOnRefreshListener { viewModel.loadData() }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.data.collect { securities ->
+                        binding.swipeLayout.isRefreshing = false
                         updateSecuritiesList(securities)
                     }
                 }
